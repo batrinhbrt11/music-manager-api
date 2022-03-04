@@ -1,7 +1,21 @@
 package com.musicmanager.musicmanger.model;
 
-public class Genre {
-    private String genreId;
+import java.util.UUID;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+@Entity
+@Table(name = "tbleGenre")
+public class Genre {   
+    @Id
+    @GenericGenerator(name = "uuid2", strategy = "uuid2") 
+    @GeneratedValue(generator = "uuid2")
+    private UUID genreId;
     private String genreName;
     private int songNum;
     public int getSongNum(){
@@ -9,15 +23,15 @@ public class Genre {
     }
     public Genre() {
     }
-    public Genre(String genreId, String genreName) {
-        this.genreId = genreId;
+    public Genre(String genreName) {
+      
         this.genreName = genreName;
     }
   
-    public String getGenreId() {
+    public UUID getGenreId() {
         return genreId;
     }
-    public void setGenreId(String genreId) {
+    public void setGenreId(UUID genreId) {
         this.genreId = genreId;
     }
     public String getGenreName() {

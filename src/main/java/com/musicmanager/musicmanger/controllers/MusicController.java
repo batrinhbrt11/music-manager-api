@@ -1,7 +1,12 @@
 package com.musicmanager.musicmanger.controllers;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.musicmanager.musicmanger.model.Music;
 import com.musicmanager.musicmanger.model.ResponseObject;
@@ -24,7 +29,11 @@ public class MusicController {
     
     @GetMapping("")
     List<Music> getAllMusic(){
-        return repository.findAll();
+      
+        Date date = new Date(2000,11,20);
+        Music music = new Music("","","",false,date);
+        List<Music> list = new ArrayList<Music>(Arrays.asList(music));
+        return list;
     }
 
     @GetMapping("/{id}")
