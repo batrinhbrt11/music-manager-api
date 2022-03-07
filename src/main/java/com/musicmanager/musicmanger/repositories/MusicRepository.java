@@ -2,15 +2,13 @@ package com.musicmanager.musicmanger.repositories;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+
 import java.util.UUID;
 
 import javax.transaction.Transactional;
 
 import com.musicmanager.musicmanger.model.Music;
 
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties.Pageable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

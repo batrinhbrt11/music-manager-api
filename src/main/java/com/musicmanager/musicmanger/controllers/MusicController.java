@@ -1,7 +1,7 @@
 package com.musicmanager.musicmanger.controllers;
 
 import java.util.ArrayList;
-import java.util.Collection;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -19,7 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -52,8 +52,6 @@ public class MusicController {
         Pageable paging = PageRequest.of(page-1, PAGE_SIZE, Sort.by("created").descending());
 		return repository.findAll(paging);
 	}
-   
-  
     @GetMapping("/{id}")
     ResponseEntity<ResponseObject> findById(@PathVariable UUID id){
         List<Music> foundMusic = repository.findByMusicId(id);
@@ -79,8 +77,6 @@ public class MusicController {
             new ResponseObject("fail","Lỗi, thêm không thành công",e.getMessage())
         );
         }
-  
-
     }
     @PutMapping("/{id}")
     ResponseEntity<ResponseObject> updateMusic(@RequestBody Music newMusic , @PathVariable UUID id){
@@ -99,7 +95,6 @@ public class MusicController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 new ResponseObject("fail","Bài hát không tồn tại",e.getMessage()));
         }
-        
     }
     @DeleteMapping("/{id}")
     ResponseEntity<ResponseObject> deleteMusic(@PathVariable UUID id){
@@ -119,4 +114,5 @@ public class MusicController {
                 new ResponseObject("fail","Không tìm thấy bài hát này",e.getMessage()));
         }
     }
+    
 }
