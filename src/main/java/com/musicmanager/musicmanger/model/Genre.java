@@ -1,33 +1,47 @@
 package com.musicmanager.musicmanger.model;
-
+import java.util.Date;
 import java.util.UUID;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+
 
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 
 @Entity
 @Table(name = "tbleGenre")
 public class Genre {   
     @Id
-    @GenericGenerator(name = "uuid2", strategy = "uuid2") 
-    @GeneratedValue(generator = "uuid2")
+    @GeneratedValue(generator = "uuid4")
+    @GenericGenerator(name = "UUID", strategy = "uuid4")
+    @Type(type="uuid-char")
     private UUID genreId;
+    @Column(nullable = false,unique = true, length = 300)
     private String genreName;
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created", nullable = false)
+    private Date created;
+    public Date getCreated() {
+        return created;
+    }
+    public void setCreated(Date created) {
+        this.created = created;
+    }
+    @Transient 
     private int songNum;
-    public int getSongNum(){
-        return songNum;
+    public Genre(String genreName) {
+        this.genreName = genreName;
     }
     public Genre() {
     }
-    public Genre(String genreName) {
-      
-        this.genreName = genreName;
-    }
-  
     public UUID getGenreId() {
         return genreId;
     }
@@ -39,5 +53,9 @@ public class Genre {
     }
     public void setGenreName(String genreName) {
         this.genreName = genreName;
+    }
+    @PrePersist
+    protected void onCreate() {
+        created = new Date();
     }
 }
