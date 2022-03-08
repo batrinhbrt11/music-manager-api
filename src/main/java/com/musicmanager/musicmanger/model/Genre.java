@@ -10,7 +10,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
+
 
 
 import org.hibernate.annotations.GenericGenerator;
@@ -35,8 +35,6 @@ public class Genre {
     public void setCreated(Date created) {
         this.created = created;
     }
-    @Transient 
-    private int songNum;
     public Genre(String genreName) {
         this.genreName = genreName;
     }
@@ -54,8 +52,10 @@ public class Genre {
     public void setGenreName(String genreName) {
         this.genreName = genreName;
     }
+   
     @PrePersist
     protected void onCreate() {
         created = new Date();
     }
+   
 }

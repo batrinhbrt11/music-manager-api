@@ -3,14 +3,21 @@ package com.musicmanager.musicmanger.model;
 public class ResponseObject {
     private String status;
     private String message;
-    private Object data;
+    private Object dataA;
+    private Object dataB;
     public ResponseObject(){
 
     }
-    public ResponseObject(String status, String message, Object data) {
+    public ResponseObject(String status, String message, Object dataA) {
         this.status = status;
         this.message = message;
-        this.data = data;
+        this.dataA = dataA;
+    }
+    public ResponseObject(String status, String message, Object dataA, Object dataB) {
+        this.status = status;
+        this.message = message;
+        this.dataA = dataA;
+        this.dataB = dataB;
     }
     public String getStatus() {
         return status;
@@ -24,11 +31,18 @@ public class ResponseObject {
     public void setMessage(String message) {
         this.message = message;
     }
-    public Object getData() {
-        return data;
+    public Object getDataA() {
+        return dataA;
     }
-    public void setData(Object data) {
-        this.data = data;
+    public void setDataA(Object dataA) {
+        this.dataA = dataA;
     }
+    public Object getDataB() {
+        return dataB;
+    }
+    public void setDataB(Object dataB) {
+        this.dataB = dataB;
+    }
+  
     
 }
