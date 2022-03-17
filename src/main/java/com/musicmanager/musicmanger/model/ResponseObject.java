@@ -3,21 +3,21 @@ package com.musicmanager.musicmanger.model;
 public class ResponseObject {
     private String status;
     private String message;
-    private Object dataA;
-    private Object dataB;
+    private Object content;
+    private Object totalElement ;
     public ResponseObject(){
 
     }
-    public ResponseObject(String status, String message, Object dataA) {
+    public ResponseObject(String status, String message, Object content) {
         this.status = status;
         this.message = message;
-        this.dataA = dataA;
+        this.content = content;
     }
-    public ResponseObject(String status, String message, Object dataA, Object dataB) {
+    public ResponseObject(String status, String message, Object content, Object totalElement) {
         this.status = status;
         this.message = message;
-        this.dataA = dataA;
-        this.dataB = dataB;
+        this.content = content;
+        this.totalElement = totalElement;
     }
     public String getStatus() {
         return status;
@@ -31,17 +31,17 @@ public class ResponseObject {
     public void setMessage(String message) {
         this.message = message;
     }
-    public Object getDataA() {
-        return dataA;
+    public Object getcontent() {
+        return content;
     }
-    public void setDataA(Object dataA) {
-        this.dataA = dataA;
+    public void setcontent(Object content) {
+        this.content = content;
     }
-    public Object getDataB() {
-        return dataB;
+    public Object gettotalElement() {
+        return totalElement;
     }
-    public void setDataB(Object dataB) {
-        this.dataB = dataB;
+    public void settotalElement(Object totalElement) {
+        this.totalElement = totalElement;
     }
   
     

@@ -18,12 +18,14 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
+@CrossOrigin(origins= "*")
 @RequestMapping(path = "api/music-manager/musics")
 public class MusicController {
    private static final Log log = LogFactory.getLog(MusicController.class);
@@ -52,9 +55,12 @@ public class MusicController {
     }
 
     @GetMapping("")
-    Page<Music> musicPageable(@RequestParam int page) {
+    ResponseEntity<ResponseObject> musicPageable(@RequestParam int page) {
         Pageable paging = PageRequest.of(page - 1, PAGE_SIZE, Sort.by("created").descending());
-        return  repository.findAll(paging);
+        PageImpl pageImpl = (PageImpl) repository.findAll(paging);
+ 
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("ok", "",pageImpl.getContent(), pageImpl.getTotalElements()));
     }
 
     @GetMapping("/genre/{idGenre}")
@@ -64,9 +70,9 @@ public class MusicController {
         Comparator<Music> compareCreateDate = (Music m1, Music m2) -> m1.getCreated().compareTo(m2.getCreated());
         Collections.sort(musics, compareCreateDate.reversed());
         Pagination paging = new Pagination(page,musics);
-        log.info(paging.paginationsList());
+    
         return ResponseEntity.status(HttpStatus.OK).body(
-            new ResponseObject("ok", "Danh sách",musics.size(), paging.paginationsList()));
+            new ResponseObject("ok", "List", paging.paginationsList(),musics.size()));
     }
     
     @GetMapping("/singer/{idSinger}")
@@ -77,7 +83,7 @@ public class MusicController {
         Collections.sort(musics, compareCreateDate.reversed());
         Pagination paging = new Pagination(page,musics);
         return ResponseEntity.status(HttpStatus.OK).body(
-            new ResponseObject("ok", "Danh sách",musics.size(), paging.paginationsList()));
+            new ResponseObject("ok", "List", paging.paginationsList(),musics.size()));
     }
     
     @GetMapping("/playlist")
@@ -88,7 +94,7 @@ public class MusicController {
         Collections.sort(musics, compareCreateDate.reversed());
         Pagination paging = new Pagination(page,musics);
         return ResponseEntity.status(HttpStatus.OK).body(
-            new ResponseObject("ok", "Danh sách",musics.size(), paging.paginationsList()));
+            new ResponseObject("ok", "List", paging.paginationsList(),musics.size()));
     }
 
     @GetMapping("/{id}")
@@ -97,7 +103,7 @@ public class MusicController {
         return (foundMusic.size() > 0) ? ResponseEntity.status(HttpStatus.OK).body(
                 new ResponseObject("ok", "", foundMusic))
                 : ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                        new ResponseObject("fail", "Bài hát không tồn tại", ""));
+                        new ResponseObject("fail", "Music not found", ""));
     }
 
     @PostMapping("")
@@ -105,12 +111,12 @@ public class MusicController {
         List<Music> foundMusic = repository.findByMusicName(newMusic.getMusicName().trim());
         try {
             return (foundMusic.size() == 0) ? ResponseEntity.status(HttpStatus.OK).body(
-                    new ResponseObject("ok", "Thêm bài hát thành công", repository.save(newMusic)))
+                    new ResponseObject("ok", "Adding successful", repository.save(newMusic)))
                     : ResponseEntity.status(HttpStatus.FOUND).body(
-                            new ResponseObject("fail", "Tên bài hát đã tồn tại, vui lòng nhập tên khác", ""));
+                            new ResponseObject("fail", "Music is existed, Enter new name", ""));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseObject("fail", "Lỗi, thêm không thành công", e.getMessage()));
+                    new ResponseObject("fail", "Error, Can not add music", e.getMessage()));
         }
     }
 
@@ -129,10 +135,10 @@ public class MusicController {
                 });
         if(updatedMusic != null){
             return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "Sửa bài hát thành công", updatedMusic));
+                new ResponseObject("ok", "Update success", updatedMusic));
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("fail", "Lỗi, sửa thất bại", ""));
+                new ResponseObject("fail", "Error, cannot update", ""));
         }
     }
 
@@ -146,10 +152,10 @@ public class MusicController {
         });
         if(updatedMusic != null){
             return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "Thêm vào playlist thành công", updatedMusic));
+                new ResponseObject("ok", "Adding playlist", updatedMusic));
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("fail", "Lỗi, thêm vào playlist thất bại", ""));
+                new ResponseObject("fail", "Error , cannot add play list", ""));
         }
     }
     @DeleteMapping("/{id}")
@@ -158,16 +164,29 @@ public class MusicController {
             Optional<Music> foundMusic = repository.findById(id);
             if (foundMusic.get().getIsPlayList() == true) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                        new ResponseObject("fail", "Bài hát có trong playlist không thể xóa", ""));
+                        new ResponseObject("fail", "Music is exited in Playlist, cannot remove ", ""));
             } else {
                 repository.deleteById(id);
                 return ResponseEntity.status(HttpStatus.OK).body(
-                        new ResponseObject("ok", "Xóa thành công", ""));
+                        new ResponseObject("ok", "Deleting success", ""));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                    new ResponseObject("fail", "Không tìm thấy bài hát này", e.getMessage()));
+                    new ResponseObject("fail", "Cannot find music", e.getMessage()));
         }
     }
 
+    @GetMapping("/search")
+    ResponseEntity<ResponseObject> getMusicBySinger(@RequestParam String text){
+        ArrayList<Music> musics = (ArrayList<Music>) repository.findAll().stream().filter(m-> m.getMusicName().contains(text) ).collect(Collectors.toList());
+        Comparator<Music> compareCreateDate = (Music m1, Music m2) -> m1.getCreated().compareTo(m2.getCreated());
+        Collections.sort(musics, compareCreateDate.reversed());
+        int endItem=10;
+        if(musics.size()<10){
+            endItem  = musics.size();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ResponseObject("ok", "List",musics.subList(0, endItem)));
+    }
+    
 }
