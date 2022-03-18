@@ -25,6 +25,7 @@ import org.springframework.data.domain.Sort;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,14 +38,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
-@CrossOrigin(origins= "*")
+
 @RequestMapping(path = "api/music-manager/musics")
 public class MusicController {
    private static final Log log = LogFactory.getLog(MusicController.class);
     private static final int PAGE_SIZE = 10;
     @Autowired
     private MusicRepository repository;
-
+ 
     @GetMapping("/getAll")
     List<Music> getAllMusic() {
         ArrayList<Music> musics = (ArrayList<Music>) repository.findAll();

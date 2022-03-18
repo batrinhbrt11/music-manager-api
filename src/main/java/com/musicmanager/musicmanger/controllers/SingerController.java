@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@CrossOrigin(origins= "*")
+//@CrossOrigin(origins= "*")
 @RequestMapping(path = "api/music-manager/singers")
 public class SingerController {
     @Autowired
