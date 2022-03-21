@@ -1,5 +1,6 @@
 package com.musicmanager.musicmanger.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import java.util.Collections;
@@ -10,14 +11,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.musicmanager.musicmanger.Pagination;
+import com.musicmanager.musicmanger.model.Genre;
 import com.musicmanager.musicmanger.model.Music;
 import com.musicmanager.musicmanger.model.ResponseObject;
+import com.musicmanager.musicmanger.model.Singer;
+import com.musicmanager.musicmanger.repositories.GenreRepository;
 import com.musicmanager.musicmanger.repositories.MusicRepository;
+import com.musicmanager.musicmanger.repositories.SingerRepository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,8 +30,6 @@ import org.springframework.data.domain.Sort;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,9 +39,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 
 @RestController
-
 @RequestMapping(path = "api/music-manager/musics")
 public class MusicController {
    private static final Log log = LogFactory.getLog(MusicController.class);
@@ -189,5 +196,72 @@ public class MusicController {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ResponseObject("ok", "List",musics.subList(0, endItem)));
     }
-    
+    @Autowired
+    private GenreRepository genreRepository;
+    @Autowired 
+    private SingerRepository singerRepository;
+    @PostMapping("/insert-from-link")
+    ResponseEntity<ResponseObject> insertMusicFromLink(@RequestParam String url) throws IOException {
+        try{
+            Document doc = Jsoup.connect(url).timeout(5000).get();
+            Element name = doc.select("h1[class=xtitle-name]").first();
+            Element page = doc.select("span[class=mr20]").last();
+            Elements genre = page.getElementsByTag("a");
+            page = doc.select("div[class=play-about]").first();
+            page = page.getElementsByClass("xtitle").first();
+            Element singer = page.getElementsByTag("a").last();
+            Element audio = doc.getElementsByTag("audio").first();
+            List<Music> foundMusic = repository.findByMusicName(name.ownText().trim());
+            if(foundMusic.size() ==0 ){
+                UUID idGenre = null;
+                if(genre.text().isEmpty()){
+                    idGenre = getIdGenre("Unknown");
+                }else{
+                    idGenre= getIdGenre(genre.text());
+                }
+                UUID idSinger  = null;
+                if(genre.text().isEmpty()){
+                    idSinger  = getIdSinger("Unknown");
+                }else{
+                    idSinger = getIdSinger(singer.text());
+                }
+          
+                Music newMusic = new Music(name.ownText(),idGenre, idSinger,false,null,audio.absUrl("src"));
+                return ResponseEntity.status(HttpStatus.FOUND).body(
+                    new ResponseObject("ok", "Adding success",repository.save(newMusic)));
+            }
+        
+            return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("fail", "Music is existed, Enter new name",""));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.OK).body(
+                new ResponseObject("fail", "Link not found",""));
+        }
+       
+    }
+
+    UUID getIdGenre(String genreName){
+        if( genreName.isEmpty() ){
+            return null;
+        }
+            List<Genre> foundGenres = genreRepository.findByGenreName(genreName.trim());
+            if(foundGenres.size() ==0){
+                Genre newGenre = new Genre(genreName);
+                return genreRepository.save(newGenre).getGenreId();
+            }
+            return foundGenres.get(0).getGenreId();
+        
+       
+    }
+    UUID getIdSinger(String singerName){
+        if( singerName.isEmpty()){
+            return null;
+        }
+        List<Singer> foundSinger = singerRepository.findBySingerName(singerName.trim());
+        if(foundSinger.size() ==0){
+            Singer newSinger = new Singer(singerName);
+            return singerRepository.save(newSinger).getSingerId();
+        }
+        return foundSinger.get(0).getSingerId();
+    }
 }

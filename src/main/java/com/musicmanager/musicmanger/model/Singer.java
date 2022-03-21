@@ -44,6 +44,9 @@ public class Singer {
   
     public Singer() {
     }
+    public Singer(String singerName) {
+        this.singerName = singerName;
+    }
     public Singer(String singerName, Date singerBirthdy, boolean singerSex, String description, String urlImage) {
         this.singerName = singerName;
         this.singerBirthdy = singerBirthdy;
