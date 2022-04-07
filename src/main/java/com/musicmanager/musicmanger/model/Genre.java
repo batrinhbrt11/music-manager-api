@@ -10,8 +10,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -29,6 +28,15 @@ public class Genre {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created", nullable = false)
     private Date created;
+
+    @Transient
+    private int count;
+    public int getCount() {
+        return count;
+    }
+    public void setCount(int count) {
+        this.count = count;
+    }
     public Date getCreated() {
         return created;
     }

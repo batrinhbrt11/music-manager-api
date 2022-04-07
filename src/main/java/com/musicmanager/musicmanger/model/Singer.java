@@ -11,7 +11,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -25,9 +25,15 @@ public class Singer {
     private UUID singerId;
     @Column(nullable = false,unique = true, length = 300)
     private String singerName;
-    private Date singerBirthdy;
+    private Date singerBirthDay;
     private boolean singerSex;
-   
+    @Transient
+    private int count;
+    public int getCount() {
+        return count;
+    }
+    public void setCount(int count) {}
+        
     public Date getCreated() {
         return created;
     }
@@ -47,9 +53,9 @@ public class Singer {
     public Singer(String singerName) {
         this.singerName = singerName;
     }
-    public Singer(String singerName, Date singerBirthdy, boolean singerSex, String description, String urlImage) {
+    public Singer(String singerName, Date singerBirthDay, boolean singerSex, String description, String urlImage) {
         this.singerName = singerName;
-        this.singerBirthdy = singerBirthdy;
+        this.singerBirthDay = singerBirthDay;
         this.singerSex = singerSex;
         this.description = description;
         this.urlImage = urlImage;
@@ -66,11 +72,11 @@ public class Singer {
     public void setSingerName(String singerName) {
         this.singerName = singerName;
     }
-    public Date getSingerBirthdy() {
-        return singerBirthdy;
+    public Date getSingerBirthDay() {
+        return singerBirthDay;
     }
-    public void setSingerBirthdy(Date singerBirthdy) {
-        this.singerBirthdy = singerBirthdy;
+    public void setSingerBirthDay(Date singerBirthDay) {
+        this.singerBirthDay = singerBirthDay;
     }
     public boolean isSingerSex() {
         return singerSex;

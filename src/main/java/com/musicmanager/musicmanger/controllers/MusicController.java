@@ -21,7 +21,7 @@ import com.musicmanager.musicmanger.repositories.SingerRepository;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.simple.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +30,8 @@ import org.springframework.data.domain.Sort;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,7 +56,7 @@ public class MusicController {
     private MusicRepository repository;
  
     @GetMapping("/getAll")
-    List<Music> getAllMusic() {
+    public List<Music> getAllMusic() {
         ArrayList<Music> musics = (ArrayList<Music>) repository.findAll();
         Comparator<Music> compareCreateDate = (Music m1, Music m2) -> m1.getCreated().compareTo(m2.getCreated());
         Collections.sort(musics, compareCreateDate.reversed());
@@ -150,8 +152,10 @@ public class MusicController {
         }
     }
 
+    @MessageMapping("/addPlaylist") 
+    @SendTo("/music/getPlaylist")
     @PutMapping("/playlist/{id}")
-    ResponseEntity<ResponseObject> addPlaylist(@PathVariable UUID id){
+    Music addPlaylist(@PathVariable UUID id){
         Music updatedMusic = repository.findById(id).map(music->{
             music.setPlayList(!music.getIsPlayList());
             return repository.save(music);
@@ -159,11 +163,10 @@ public class MusicController {
             return null;
         });
         if(updatedMusic != null){
-            return ResponseEntity.status(HttpStatus.OK).body(
-                new ResponseObject("ok", "Adding playlist", updatedMusic));
+            
+            return  updatedMusic;
         }else{
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-                new ResponseObject("fail", "Error , cannot add play list", ""));
+            return null;
         }
     }
     @DeleteMapping("/{id}")

@@ -54,7 +54,7 @@ public class SingerController {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("singerId", singer.getSingerId());
             jsonObject.put("singerName", singer.getSingerName());
-            jsonObject.put("singerBirthDay", singer.getSingerBirthdy());
+            jsonObject.put("singerBirthDay", singer.getSingerBirthDay());
             jsonObject.put("singerSex", singer.isSingerSex());
             jsonObject.put("description", singer.getDescription());
             jsonObject.put("urlImage", singer.getUrlImage());
@@ -90,7 +90,7 @@ public class SingerController {
         Singer updatedSinger = repository.findById(id)
                                 .map(singer->{
                                     singer.setSingerName(newSinger.getSingerName());
-                                    singer.setSingerBirthdy(newSinger.getSingerBirthdy());
+                                    singer.setSingerBirthDay(newSinger.getSingerBirthDay());
                                     singer.setSingerSex(newSinger.isSingerSex());
                                     singer.setDescription(newSinger.getDescription());
                                     singer.setUrlImage(newSinger.getUrlImage());
